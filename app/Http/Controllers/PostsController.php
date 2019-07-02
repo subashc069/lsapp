@@ -56,7 +56,8 @@ class PostsController extends Controller
         //store in the database
         $post = new Post;
         $post->title = $request->title;
-        $post->body =$request->body;    
+        $post->body =$request->body;
+        $post->user_id =auth()->user()->id;    
 
         $post->save();
         
@@ -77,6 +78,10 @@ class PostsController extends Controller
     {
         //
         $post = Post::find($id);
+        if (!$post) {
+            Session::flash('success','this blog post was not found');
+            return redirect()->route('posts.index');
+        }
         return view('posts.show')->with('post',$post);
     }
 
@@ -89,6 +94,8 @@ class PostsController extends Controller
     public function edit($id)
     {
         //
+        $post =Post::find($id);
+        return view('posts.edit')->with('post',$post);
     }
 
     /**
@@ -100,7 +107,23 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        //validate the data
+        $this->validate($request,[
+            'title' =>'required|max:255',
+            'body' =>'required',
+        ]);
+        //store in the database
+        $post = Post::find($id);
+        $post->title = $request->title;
+        $post->body =$request->body;    
+
+        $post->save();
+        
+        //flash message
+        Session::flash('success','this blog post wsa seccessfully updated');
+
+        //redirect to another page
+        return redirect()->route('posts.show',$post->id);
     }
 
     /**
@@ -111,6 +134,10 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $post = Post::find($id);
+        $post->delete();
+        Session::flash('success','this blog post was seccessfully deleted');
+        return redirect()->route('posts.index');
+
     }
 }
