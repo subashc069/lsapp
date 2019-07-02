@@ -7,7 +7,7 @@
         {{$post->body}}
     </div>
     <hr>
-    <small>Written on {{$post->created_at}}</small>
+    <small>Written on {{$post->created_at}} by {{$post->user->name}}</small>
     <hr>
     <a href="{{ route('posts.edit', ['id' => $post->id]) }}" class="btn btn-default">Edit</a>
     <form action="{{ route('posts.destroy', ['id' => $post->id]) }}" method="POST">
