@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post;
 use DB;
+use Session;
 
 class PostsController extends Controller
 {
@@ -24,7 +25,7 @@ class PostsController extends Controller
         //$posts = Post::orderBy('title','desc')->take(1)->get();
         
         //pagination
-        $posts = Post::orderBy('title','desc')->paginate(10);
+        $posts = Post::orderBy('id','desc')->paginate(10);
 
         return view('posts.index')->with('posts',$posts);
     }
@@ -47,7 +48,23 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //validate the data
+        $this->validate($request,[
+            'title' =>'required|max:255',
+            'body' =>'required',
+        ]);
+        //store in the database
+        $post = new Post;
+        $post->title = $request->title;
+        $post->body =$request->body;    
+
+        $post->save();
+        
+        //flash message
+        Session::flash('success','this blog post wsa seccessfully saved');
+
+        //redirect to another page
+        return redirect()->route('posts.show',$post->id);
     }
 
     /**
