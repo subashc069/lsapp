@@ -8,7 +8,16 @@ use DB;
 use Session;
 
 class PostsController extends Controller
-{
+{   
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth',['except'=>['index', 'show']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -95,6 +104,10 @@ class PostsController extends Controller
     {
         //
         $post =Post::find($id);
+        //check for correct user
+        if(auth()->user()->id !== $post->user_id){
+            return redirect()->route('posts.index')->with('error','unautharized page'); 
+        }
         return view('posts.edit')->with('post',$post);
     }
 
@@ -135,6 +148,11 @@ class PostsController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
+        
+        //check for correct user
+        if(auth()->user()->id !== $post->user_id){
+            return redirect()->route('posts.index')->with('error','unautharized page'); 
+        }
         $post->delete();
         Session::flash('success','this blog post was seccessfully deleted');
         return redirect()->route('posts.index');

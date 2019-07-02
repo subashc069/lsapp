@@ -9,10 +9,15 @@
     <hr>
     <small>Written on {{$post->created_at}} by {{$post->user->name}}</small>
     <hr>
-    <a href="{{ route('posts.edit', ['id' => $post->id]) }}" class="btn btn-default">Edit</a>
-    <form action="{{ route('posts.destroy', ['id' => $post->id]) }}" method="POST">
-        @method('DELETE')
-        @csrf
-        <button type="submit">Delete Post</button>
-    </form>
+    @if (!Auth::guest())
+        @if (Auth::user()->id == $post->user_id)
+        <a href="{{ route('posts.edit', ['id' => $post->id]) }}" class="btn btn-default">Edit</a>
+        <form action="{{ route('posts.destroy', ['id' => $post->id]) }}" method="POST">
+            @method('DELETE')
+            @csrf
+            <button type="submit">Delete Post</button>
+        </form>     
+        @endif
+    @endif
+    
 @endsection
